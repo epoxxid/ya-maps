@@ -1,0 +1,23 @@
+{
+  "name": "ya-maps",
+  "version": "1.0.0",
+  "description": "Wrapper library for Yandex.Maps service",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/epoxxid/ya-maps.git"
+  },
+  "keywords": [
+    "yandex-maps",
+    "ymaps"
+  ],
+  "author": "Roman Kovalev <epoxxid@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/epoxxid/ya-maps/issues"
+  },
+  "homepage": "https://github.com/epoxxid/ya-maps#readme"
+}
