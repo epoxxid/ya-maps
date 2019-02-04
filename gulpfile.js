@@ -1,4 +1,4 @@
-const { dest, series } = require('gulp');
+const { dest } = require('gulp');
 const browserify = require('browserify');
 const babelify = require('babelify');
 const source = require('vinyl-source-stream');
