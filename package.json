@@ -19,5 +19,23 @@
   "bugs": {
     "url": "https://github.com/epoxxid/ya-maps/issues"
   },
-  "homepage": "https://github.com/epoxxid/ya-maps#readme"
+  "homepage": "https://github.com/epoxxid/ya-maps#readme",
+  "devDependencies": {
+    "gulp": "^4.0.0",
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.3.1",
+    "babelify": "^10.0.0",
+    "browserify": "^16.2.3",
+    "chai": "^4.2.0",
+    "gulp-babel": "^8.0.0",
+    "gulp-browserify": "^0.5.1",
+    "gulp-rename": "^1.4.0",
+    "gulp-sourcemaps": "^2.6.4",
+    "mocha": "^5.2.0",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0"
+  },
+  "dependencies": {
+    "ymaps": "^0.1.1"
+  }
 }
