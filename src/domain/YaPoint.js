@@ -92,4 +92,4 @@ class YaPoint {
     };
 }
 
-exports.default = YaPoint;
+module.exports = YaPoint;
