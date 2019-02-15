@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const YaPlaceMark = require('../src/domain/YaPlaceMark.js');
+const YaPlaceMark = require('../src/YaPlaceMark.js');
 const geo = require('./data/geoData');
 
 function isValidPointObject(point) {
@@ -169,5 +169,9 @@ describe('YaPlaceMark', function () {
                 YaPlaceMark.createFromDump({});
             }).to.throw('coordinates value is invalid');
         });
+    });
+
+    describe('#asStaticUrlParam()', function() {
+        it.skip('converts placeMark into static url param');
     });
 });

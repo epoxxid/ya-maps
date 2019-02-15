@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 const geo = require('./data/geoData');
 
-const YaPoint = require('../src/domain/YaPoint.js');
+const YaPoint = require('../src/YaPoint.js');
 
 function isValidPointObject(point) {
     expect(point).to.be.an.instanceof(YaPoint, 'valid instance');

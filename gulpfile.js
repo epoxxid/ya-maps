@@ -8,7 +8,7 @@ const sourceMaps = require('gulp-sourcemaps');
 
 const config = {
     js: {
-        inputFile: 'src/index.js',
+        inputFile: 'src/YaMap.js',
         outputName: 'map.js',
         outputDir: './dist/',
         mapsDir: './maps/'

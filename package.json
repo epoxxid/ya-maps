@@ -2,7 +2,7 @@
   "name": "ya-maps",
   "version": "1.0.0",
   "description": "Wrapper library for Yandex.Maps service",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "mocha",
     "build": "gulp build"
