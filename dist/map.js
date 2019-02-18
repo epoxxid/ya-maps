@@ -208,7 +208,7 @@ class YaMap {
    */
   getStaticUrl(config = {}) {
     let [latitude, longitude] = this.getCenter().toArray(true);
-    return buildStaticUrl({
+    return YaMap.buildStaticUrl({
       zoom: this.getZoom(),
       latitude,
       longitude,
@@ -388,7 +388,7 @@ class YaMap {
 
 module.exports = YaMap;
 
-},{"./YaPlaceMark":2,"./YaPoint":3,"./YaPolygon":4,"./loader":5}],2:[function(require,module,exports){
+},{"./YaPlaceMark":2,"./YaPoint":3,"./YaPolygon":4,"./loader":6}],2:[function(require,module,exports){
 const YaPoint = require('./YaPoint');
 
 class YaPlaceMark {
@@ -823,9 +823,20 @@ class YaPolygon {
 module.exports = YaPolygon;
 
 },{"./YaPoint":3}],5:[function(require,module,exports){
+const YaMap = require('./YaMap');
+
+let map = new YaMap();
+map.bindToElement('#map');
+let status = true;
+document.addEventListener('click', function () {
+  status ? map.unbindFromElement() : map.bindToElement('#map');
+  status = !status;
+});
+
+},{"./YaMap":1}],6:[function(require,module,exports){
 (function (global){
 const DEFAULT_API_URL = 'https://api-maps.yandex.ru/2.1/?lang=en_RU';
-exports.default = {
+module.exports = {
   load: function (src) {
     src = src || DEFAULT_API_URL;
     this.promise = this.promise || new Promise((resolve, reject) => {
@@ -857,6 +868,6 @@ exports.default = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}]},{},[1]);
+},{}]},{},[5]);
 
 //# sourceMappingURL=maps/map.js.map

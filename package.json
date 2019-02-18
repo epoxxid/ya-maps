@@ -2,10 +2,11 @@
   "name": "ya-maps",
   "version": "1.0.0",
   "description": "Wrapper library for Yandex.Maps service",
-  "main": "src/index.js",
+  "main": "src/YaMap.js",
   "scripts": {
     "test": "mocha",
-    "build": "gulp build"
+    "build": "gulp build",
+    "watch": "gulp watch"
   },
   "repository": {
     "type": "git",

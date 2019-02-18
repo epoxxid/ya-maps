@@ -1,4 +1,4 @@
-const { dest } = require('gulp');
+const gulp = require('gulp');
 const browserify = require('browserify');
 const babelify = require('babelify');
 const source = require('vinyl-source-stream');
@@ -8,7 +8,8 @@ const sourceMaps = require('gulp-sourcemaps');
 
 const config = {
     js: {
-        inputFile: 'src/YaMap.js',
+        inputFile: 'src/index.js',
+        watchFiles: 'src/**/*.js',
         outputName: 'map.js',
         outputDir: './dist/',
         mapsDir: './maps/'
@@ -22,11 +23,10 @@ function bundle(bundler) {
         .pipe(rename(config.js.outputName))
         .pipe(sourceMaps.init({loadMaps: true}))
         .pipe(sourceMaps.write(config.js.mapsDir))
-        .pipe(dest(config.js.outputDir));
+        .pipe(gulp.dest(config.js.outputDir));
 }
 
 function build(cb) {
-
     let bundler = browserify(config.js.inputFile)
         .transform(babelify);
 
@@ -35,5 +35,11 @@ function build(cb) {
     cb();
 }
 
+function watch(cb) {
+    gulp.watch(config.js.watchFiles, build);
+    cb();
+}
+
 
 exports.build = build;
+exports.watch = watch;

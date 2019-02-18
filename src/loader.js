@@ -1,6 +1,6 @@
 const DEFAULT_API_URL = 'https://api-maps.yandex.ru/2.1/?lang=en_RU';
 
-exports.default = {
+module.exports = {
     load: function (src) {
         src = src || DEFAULT_API_URL;
         this.promise = this.promise || new Promise((resolve, reject) => {

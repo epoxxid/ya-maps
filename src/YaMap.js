@@ -201,7 +201,7 @@ class YaMap {
      */
     getStaticUrl(config = {}) {
         let [latitude, longitude] = this.getCenter().toArray(true);
-        return buildStaticUrl({
+        return YaMap.buildStaticUrl({
             zoom: this.getZoom(),
             latitude,
             longitude,
