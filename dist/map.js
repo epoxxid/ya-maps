@@ -461,17 +461,11 @@ class YaMap {
 
   onClickGetAddress(cb) {
     if (typeof cb !== 'function') return;
-    let placeMark = null;
     this.on('click', e => {
       // Click coordinates
       let coordinates = YaPoint.from(e.get('coords')).toArray();
-      YaMap.getAddressByCoordinates(coordinates, cb); // Init placeMark object
-
-      if (null === placeMark) {
-        placeMark = this.addPlaceMark(coordinates);
-      } else {
-        placeMark.setPosition(coordinates);
-      }
+      this.markPlace(coordinates);
+      YaMap.getAddressByCoordinates(coordinates, cb);
     });
   }
 
