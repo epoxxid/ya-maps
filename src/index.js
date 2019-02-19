@@ -1,11 +1,16 @@
 const YaMap = require('./YaMap');
 
-let map = new YaMap();
-map.bindToElement('#map');
+// let map = new YaMap();
+// map.bindToElement('#map');
+//
+// map.onClickGetAddress(function(data) {
+//     console.log(data);
+// });
 
-map.onClickGetAddress(function(data) {
-    console.log(data);
+YaMap.getCoordinatesByAddress('Армавир, Энгельса, 100', function(info) {
+    console.log(info);
 });
+
 
 // let status = true;
 // document.addEventListener('click', function() {

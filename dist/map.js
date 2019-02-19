@@ -179,6 +179,32 @@ class YaMap {
     }).catch(e => console.log(e));
   }
   /**
+   * Attempt to search information about
+   * @param {string} address
+   * @param {function} cb
+   */
+
+
+  static getCoordinatesByAddress(address, cb) {
+    if (typeof cb !== 'function') return;
+    loader.load(MAPS_SRC).then(maps => {
+      maps.geocode(address, {
+        results: 1
+      }).then(result => {
+        let obj = result.geoObjects.get(0);
+        cb({
+          coordinates: obj.geometry.getCoordinates(),
+          bounds: obj.properties.get("boundedBy"),
+          country: obj.getCountry(),
+          locality: obj.getLocalities().join(', '),
+          address: obj.getAddressLine(),
+          premise: obj.getPremise() || '',
+          house: obj.getPremiseNumber() || ''
+        });
+      }).catch(e => console.log(e));
+    }).catch(e => console.log(e));
+  }
+  /**
    * Returns map center point
    * @returns {YaPoint}
    */
@@ -905,12 +931,16 @@ class YaPolygon {
 module.exports = YaPolygon;
 
 },{"./YaPoint":3}],5:[function(require,module,exports){
-const YaMap = require('./YaMap');
+const YaMap = require('./YaMap'); // let map = new YaMap();
+// map.bindToElement('#map');
+//
+// map.onClickGetAddress(function(data) {
+//     console.log(data);
+// });
 
-let map = new YaMap();
-map.bindToElement('#map');
-map.onClickGetAddress(function (data) {
-  console.log(data);
+
+YaMap.getCoordinatesByAddress('Армавир, Энгельса, 100', function (info) {
+  console.log(info);
 }); // let status = true;
 // document.addEventListener('click', function() {
 //     status ? map.unbindFromElement() : map.bindToElement('#map');
