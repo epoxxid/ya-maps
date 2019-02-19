@@ -360,7 +360,7 @@ class YaMap {
                 if (pm.rendered) return;
 
                 let pmGeo = new maps.Placemark(
-                    pm.getCoordinates(),
+                    pm.getPosition().toArray(),
                     pm.getOptions(),
                     pm.getConfig()
                 );
