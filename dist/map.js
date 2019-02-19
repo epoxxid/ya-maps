@@ -278,16 +278,19 @@ class YaMap {
 
   /**
    * Init map at the DOM element with given selector
-   * @param selector
+   * @param element
    */
-  bindToElement(selector, cb) {
-    const elm = document.querySelector(selector);
+  bindToElement(element, cb) {
+    if (element instanceof HTMLElement) {
+      this.domElement = element;
+    } else if (typeof element === 'string') {
+      this.domElement = document.querySelector(selector);
 
-    if (!elm) {
-      throw new Error(`Unable to find element with selector ${selector} to bind map to`);
+      if (!this.domElement) {
+        throw new Error(`Unable to find element with selector ${selector} to bind map to`);
+      }
     }
 
-    this.domElement = elm;
     loader.load(MAPS_SRC).then(maps => {
       const map = new maps.Map(this.domElement, {
         center: this.getCenter().toArray(),
