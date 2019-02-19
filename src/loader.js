@@ -1,4 +1,4 @@
-const DEFAULT_API_URL = 'https://api-maps.yandex.ru/2.1/?lang=en_RU';
+const DEFAULT_API_URL = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
 
 module.exports = {
     load: function (src) {

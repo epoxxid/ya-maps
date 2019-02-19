@@ -55,6 +55,9 @@ class YaPlaceMark {
      */
     setPosition(coordinates) {
         this._position = YaPoint.from(coordinates);
+        if (this._geoObject) {
+            this._geoObject.geometry.setCoordinates(coordinates);
+        }
     };
 
     /**

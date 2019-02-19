@@ -7,8 +7,11 @@ const YaPolygon = require('./YaPolygon');
 const DEFAULT_CENTER = [44.99, 41.12];
 const DEFAULT_ZOOM = 10;
 const MAX_ALLOWED_ZOOM = 20;
-const MAPS_SRC = 'https://api-maps.yandex.ru/2.1/?lang=en_RU&mode=debug';
+const MAPS_SRC = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU&mode=debug';
 
+/**
+ *
+ */
 class YaMap {
     constructor(config = {}) {
         if (typeof config !== 'object') {
@@ -32,6 +35,8 @@ class YaMap {
 
         this.placeMarks = [];
         this.polygons = [];
+
+        this._eventHandlers = {};
     }
 
     static buildStaticUrl(data = {}, options = {}) {
@@ -142,6 +147,35 @@ class YaMap {
         return map;
     }
 
+    /**
+     * Returns address by given coordinates
+     * @param {array|string} coordinates
+     * @param {function} cb
+     */
+    static getAddressByCoordinates(coordinates, cb) {
+        let point = YaPoint.from(coordinates);
+        loader.load(MAPS_SRC).then(maps => {
+            maps.geocode(point.toArray()).then(result => {
+                let obj = result.geoObjects.get(0);
+                let meta = obj.properties.get('metaDataProperty');
+                let parts = meta.GeocoderMetaData.Address.Components;
+
+                if (!parts.length) return null;
+
+                // Fill up address object
+                let address = {
+                    coordinates: point.toString()
+                };
+
+                parts.forEach(p => address[p.kind] = p.name);
+
+                if (typeof cb === "function") {
+                    return cb(address);
+                }
+            }).catch(e => console.log(e));
+        }).catch(e => console.log(e));
+    }
+
 
     /**
      * Returns map center point
@@ -216,7 +250,7 @@ class YaMap {
      * Init map at the DOM element with given selector
      * @param selector
      */
-    bindToElement(selector) {
+    bindToElement(selector, cb) {
         const elm = document.querySelector(selector);
 
         if (!elm) {
@@ -250,8 +284,21 @@ class YaMap {
                 }
             });
 
+            // Bind handlers
+            for (let eventName in this._eventHandlers) {
+                if (!this._eventHandlers.hasOwnProperty(eventName)) continue;
+
+                let handlers = this._eventHandlers[eventName];
+                if (!Array.isArray(handlers)) continue;
+
+                this._eventHandlers[eventName].forEach(handler => {
+                    map.events.add(eventName, handler);
+                });
+            }
+
             this.mapObject = map;
             this.refresh();
+            if (typeof cb === 'function') cb(maps);
         });
     };
 
@@ -386,6 +433,44 @@ class YaMap {
 
                 pg.startEditing();
             });
+        });
+    };
+
+    /**
+     * Bind event handler to the map
+     * @param eventName
+     * @param handler
+     */
+    on(eventName, handler) {
+        if (typeof eventName !== 'string' || typeof handler !== 'function') return;
+
+        if (!Array.isArray(this._eventHandlers[eventName])) {
+            this._eventHandlers[eventName] = [];
+        }
+        this._eventHandlers[eventName].push(handler);
+        if (this.mapObject) {
+            this.mapObject.events.add(eventName, handler);
+        }
+    }
+
+    onClickGetAddress(cb) {
+        if (typeof cb !== 'function') return;
+
+        let placeMark = null;
+
+        this.on('click', e => {
+            // Click coordinates
+            let coordinates = YaPoint.from(e.get('coords')).toArray();
+
+            YaMap.getAddressByCoordinates(coordinates, cb);
+
+
+            // Init placeMark object
+            if (null === placeMark) {
+                placeMark = this.addPlaceMark(coordinates);
+            } else {
+                placeMark.setPosition(coordinates);
+            }
         });
     };
 
