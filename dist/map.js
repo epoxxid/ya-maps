@@ -476,6 +476,28 @@ class YaMap {
   }
 
   /**
+   * Mark place with given coordinates on map
+   * @param {string|array} coordinates
+   * @param {object} config
+   * @param {function} cb
+   * @returns {*}
+   */
+  markPlace(coordinates, config, cb) {
+    let pm,
+        point = YaPoint.from(coordinates);
+    this.setCenter(point.toArray());
+
+    if (this.placeMarks.length) {
+      pm = this.placeMarks[0].setPosition(point.toArray());
+    } else {
+      pm = this.addPlaceMark(point.toArray());
+    }
+
+    if (typeof cb === 'function') cb(pm);
+    return;
+  }
+
+  /**
    * Dump map data to portable format
    * @returns {Object}
    */
@@ -931,23 +953,10 @@ class YaPolygon {
 module.exports = YaPolygon;
 
 },{"./YaPoint":3}],5:[function(require,module,exports){
-const YaMap = require('./YaMap'); // let map = new YaMap();
-// map.bindToElement('#map');
-//
-// map.onClickGetAddress(function(data) {
-//     console.log(data);
-// });
+const YaMap = require('./YaMap');
 
-
-YaMap.getCoordinatesByAddress('Армавир, Энгельса, 100', function (info) {
-  console.log(info);
-}); // let status = true;
-// document.addEventListener('click', function() {
-//     status ? map.unbindFromElement() : map.bindToElement('#map');
-//     status = !status;
-// });
-//
-//
+let map = new YaMap();
+map.bindToElement('#map');
 
 },{"./YaMap":1}],6:[function(require,module,exports){
 (function (global){

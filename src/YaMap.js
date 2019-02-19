@@ -200,7 +200,6 @@ class YaMap {
         }).catch(e => console.log(e));
     }
 
-
     /**
      * Returns map center point
      * @returns {YaPoint}
@@ -496,6 +495,28 @@ class YaMap {
                 placeMark.setPosition(coordinates);
             }
         });
+    };
+
+    /**
+     * Mark place with given coordinates on map
+     * @param {string|array} coordinates
+     * @param {object} config
+     * @param {function} cb
+     * @returns {*}
+     */
+    markPlace(coordinates, config, cb) {
+        let pm, point = YaPoint.from(coordinates);
+
+        this.setCenter(point.toArray());
+
+        if (this.placeMarks.length) {
+            pm = this.placeMarks[0].setPosition(point.toArray());
+        } else {
+            pm = this.addPlaceMark(point.toArray());
+        }
+
+        if (typeof cb === 'function') cb(pm);
+        return;
     };
 
     /**
