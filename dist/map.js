@@ -900,8 +900,8 @@ class YaPolygon {
    * Returns an array of polygon vertexes
    * @returns {YaPoint[]}
    */
-  getVertexes() {
-    return this._vertexes;
+  getVertexes(asArray = false) {
+    return asArray ? this._vertexes.map(vx => vx.toArray()) : this._vertexes;
   }
 
   /**
@@ -983,7 +983,7 @@ class YaPolygon {
    */
   dump() {
     let data = {
-      vertexes: this.getVertexes().map(vx => vx.toArray()),
+      vertexes: this.getVertexes(true),
       config: {
         strokeWidth: this.strokeWidth,
         strokeColor: this.strokeColor,
