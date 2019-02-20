@@ -46,7 +46,7 @@ class YaPolygon {
         this.rendered = false;
         this.edited = false;
 
-        this.geoObject = null;
+        this._geoObject = null;
     }
 
     /**
@@ -77,6 +77,22 @@ class YaPolygon {
     };
 
     /**
+     * @returns {Object|undefined}
+     */
+    getGeoObject() {
+        return this._geoObject;
+    }
+
+    /**
+     * @param geoObject
+     * @returns {YaPolygon}
+     */
+    setGeoObject(geoObject) {
+        this._geoObject = geoObject;
+        return this;
+    }
+
+    /**
      * Polygon configuration object
      * @returns {{editorDrawingCursor: string, strokeWidth: *, strokeColor: string, fillColor: string, opacity: *}}
      */
@@ -95,15 +111,15 @@ class YaPolygon {
      * @returns {boolean}
      */
     startEditing() {
-        if (!this.geoObject) {
+        if (!this._geoObject) {
             console.log('Cannot startEditing polygon: geoObject not initialized yet');
             return false;
         }
 
         if (!this.getVertexes().length) {
-            this.geoObject.editor.startDrawing();
+            this._geoObject.editor.startDrawing();
         } else {
-            this.geoObject.editor.startEditing();
+            this._geoObject.editor.startEditing();
         }
 
         this.edited = true;
@@ -115,10 +131,10 @@ class YaPolygon {
     finishEditing() {
         if (!this.edited) return;
 
-        this.geoObject.editor.stopDrawing();
-        this.geoObject.editor.stopEditing();
+        this._geoObject.editor.stopDrawing();
+        this._geoObject.editor.stopEditing();
 
-        this.loadVertexes(this.geoObject.geometry.getCoordinates()[0]);
+        this.loadVertexes(this._geoObject.geometry.getCoordinates()[0]);
         this.edited = false;
     };
 

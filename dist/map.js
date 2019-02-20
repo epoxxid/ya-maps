@@ -278,16 +278,17 @@ class YaMap {
 
   /**
    * Init map at the DOM element with given selector
-   * @param element
+   * @param target
+   * @param {function} cb
    */
-  bindToElement(element, cb) {
-    if (element instanceof HTMLElement) {
-      this.domElement = element;
-    } else if (typeof element === 'string') {
-      this.domElement = document.querySelector(selector);
+  bindToElement(target, cb) {
+    if (target instanceof HTMLElement) {
+      this.domElement = target;
+    } else if (typeof target === 'string') {
+      this.domElement = document.querySelector(target);
 
       if (!this.domElement) {
-        throw new Error(`Unable to find element with selector ${selector} to bind map to`);
+        throw new Error(`Unable to find element with selector ${target} to bind map to`);
       }
     }
 
@@ -325,7 +326,7 @@ class YaMap {
 
       this.mapObject = map;
       this.refresh();
-      if (typeof cb === 'function') cb(maps);
+      if (typeof cb === 'function') cb(this);
     });
   }
 
@@ -370,6 +371,24 @@ class YaMap {
   }
 
   /**
+   * Remove given place mark from object
+   * @param {YaPlaceMark} pm
+   */
+  removePlaceMark(pm) {
+    let idx = this.placeMarks.indexOf(pm);
+
+    if (idx === -1) {
+      throw new Error('Unable to delete polygon: map does not contain given object');
+    }
+
+    if (this.mapObject) {
+      this.mapObject.geoObjects.remove(pm.getGeoObject());
+    }
+
+    this.placeMarks.splice(idx, 1);
+  }
+
+  /**
    * Add polygon object to the map
    * @param {Array} vertexes
    * @param {Object} config
@@ -380,6 +399,24 @@ class YaMap {
     this.polygons.push(pg);
     this.refresh();
     return pg;
+  }
+
+  /**
+   * Remove polygon from the map
+   * @param {YaPolygon} pg
+   */
+  removePolygon(pg) {
+    let idx = this.polygons.indexOf(pg);
+
+    if (idx === -1) {
+      throw new Error('Unable to delete polygon: map does not contain given object');
+    }
+
+    if (this.mapObject) {
+      this.mapObject.geoObjects.remove(pg.getGeoObject());
+    }
+
+    this.polygons.splice(idx, 1);
   }
 
   /**
@@ -427,18 +464,18 @@ class YaMap {
       // Render place marks
       this.placeMarks.forEach(pm => {
         if (pm.rendered) return;
-        let pmGeo = new maps.Placemark(pm.getPosition().toArray(), pm.getOptions(), pm.getConfig());
-        this.mapObject.geoObjects.add(pmGeo);
-        pm.setGeoObject(pmGeo);
+        let geoObject = new maps.Placemark(pm.getPosition().toArray(), pm.getOptions(), pm.getConfig());
+        pm.setGeoObject(geoObject);
+        this.mapObject.geoObjects.add(geoObject);
         pm.rendered = true;
       }); // Render polygons
 
       this.polygons.forEach(pg => {
-        if (pg.rendered) return false;
-        pg.geoObject = new maps.Polygon([pg.getVertexes().map(vx => vx.toArray())], pg.getOptions(), pg.getConfig());
-        this.mapObject.geoObjects.add(pg.geoObject);
+        if (pg.rendered) return;
+        let geoObject = new maps.Polygon([pg.getVertexes().map(vx => vx.toArray())], pg.getOptions(), pg.getConfig());
+        pg.setGeoObject(geoObject);
+        this.mapObject.geoObjects.add(geoObject);
         pg.rendered = true;
-        pg.startEditing();
       });
     });
   }
@@ -491,7 +528,7 @@ class YaMap {
     }
 
     if (typeof cb === 'function') cb(pm);
-    return;
+    return pm;
   }
 
   /**
@@ -528,8 +565,6 @@ class YaPlaceMark {
       throw new Error('YaPlaceMark: options param should be an object');
     }
 
-    this._geoObject = null;
-    this.rendered = false;
     this.setPosition(coordinates);
     this.text = options.text || '';
     this.hint = options.hint || '';
@@ -538,6 +573,8 @@ class YaPlaceMark {
     this.color = options.color || '#3a64ff';
     this.preset = options.preset || '';
     this.draggable = options.draggable || false;
+    this._geoObject = null;
+    this.rendered = false;
   }
   /**
    * Create place mark object from dump
@@ -651,8 +688,8 @@ class YaPlaceMark {
   startEditing() {
     this.draggable = true;
 
-    if (this.geoObject) {
-      this.geoObject.options.set('draggable', true);
+    if (this._geoObject) {
+      this._geoObject.options.set('draggable', true);
     }
   }
 
@@ -662,8 +699,8 @@ class YaPlaceMark {
   finishEditing() {
     this.draggable = false;
 
-    if (this.geoObject) {
-      this.geoObject.options.set('draggable', false);
+    if (this._geoObject) {
+      this._geoObject.options.set('draggable', false);
     }
   }
 
@@ -843,7 +880,7 @@ class YaPolygon {
     this.opacity = config.opacity || 0.8;
     this.rendered = false;
     this.edited = false;
-    this.geoObject = null;
+    this._geoObject = null;
   }
   /**
    * Load vertexes to polygon
@@ -876,9 +913,27 @@ class YaPolygon {
   }
 
   /**
+   * @returns {Object|undefined}
+   */
+  getGeoObject() {
+    return this._geoObject;
+  }
+  /**
+   * @param geoObject
+   * @returns {YaPolygon}
+   */
+
+
+  setGeoObject(geoObject) {
+    this._geoObject = geoObject;
+    return this;
+  }
+  /**
    * Polygon configuration object
    * @returns {{editorDrawingCursor: string, strokeWidth: *, strokeColor: string, fillColor: string, opacity: *}}
    */
+
+
   getConfig() {
     return {
       editorDrawingCursor: 'crosshair',
@@ -894,15 +949,15 @@ class YaPolygon {
    * @returns {boolean}
    */
   startEditing() {
-    if (!this.geoObject) {
+    if (!this._geoObject) {
       console.log('Cannot startEditing polygon: geoObject not initialized yet');
       return false;
     }
 
     if (!this.getVertexes().length) {
-      this.geoObject.editor.startDrawing();
+      this._geoObject.editor.startDrawing();
     } else {
-      this.geoObject.editor.startEditing();
+      this._geoObject.editor.startEditing();
     }
 
     this.edited = true;
@@ -913,9 +968,12 @@ class YaPolygon {
    */
   finishEditing() {
     if (!this.edited) return;
-    this.geoObject.editor.stopDrawing();
-    this.geoObject.editor.stopEditing();
-    this.loadVertexes(this.geoObject.geometry.getCoordinates()[0]);
+
+    this._geoObject.editor.stopDrawing();
+
+    this._geoObject.editor.stopEditing();
+
+    this.loadVertexes(this._geoObject.geometry.getCoordinates()[0]);
     this.edited = false;
   }
 

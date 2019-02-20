@@ -271,19 +271,21 @@ class YaMap {
 
     /**
      * Init map at the DOM element with given selector
-     * @param element
+     * @param target
+     * @param {function} cb
      */
-    bindToElement(element, cb) {
-        if (element instanceof HTMLElement) {
-            this.domElement = element;
-        } else if (typeof element === 'string') {
-            this.domElement = document.querySelector(selector);
+    bindToElement(target, cb) {
+
+        if (target instanceof HTMLElement) {
+            this.domElement = target;
+        } else if (typeof target === 'string') {
+            this.domElement = document.querySelector(target);
             if (!this.domElement) {
-                throw new Error(`Unable to find element with selector ${selector} to bind map to`);
+                throw new Error(`Unable to find element with selector ${target} to bind map to`);
             }
         }
 
-        loader.load(MAPS_SRC).then((maps) => {
+        loader.load(MAPS_SRC).then(maps => {
 
             const map = new maps.Map(this.domElement, {
                 center: this.getCenter().toArray(),
@@ -322,7 +324,8 @@ class YaMap {
 
             this.mapObject = map;
             this.refresh();
-            if (typeof cb === 'function') cb(maps);
+
+            if (typeof cb === 'function') cb(this);             
         });
     };
 
@@ -369,6 +372,24 @@ class YaMap {
     };
 
     /**
+     * Remove given place mark from object
+     * @param {YaPlaceMark} pm
+     */
+    removePlaceMark(pm) {
+        let idx = this.placeMarks.indexOf(pm);
+
+        if (idx === -1) {
+            throw new Error('Unable to delete polygon: map does not contain given object');
+        }
+
+        if (this.mapObject) {
+            this.mapObject.geoObjects.remove(pm.getGeoObject());
+        }
+
+        this.placeMarks.splice(idx, 1);
+    };
+
+    /**
      * Add polygon object to the map
      * @param {Array} vertexes
      * @param {Object} config
@@ -379,6 +400,24 @@ class YaMap {
         this.polygons.push(pg);
         this.refresh();
         return pg;
+    };
+
+    /**
+     * Remove polygon from the map
+     * @param {YaPolygon} pg
+     */
+    removePolygon(pg) {
+        let idx = this.polygons.indexOf(pg);
+
+        if (idx === -1) {
+            throw new Error('Unable to delete polygon: map does not contain given object');
+        }
+
+        if (this.mapObject) {
+            this.mapObject.geoObjects.remove(pg.getGeoObject());
+        }
+
+        this.polygons.splice(idx, 1);
     };
 
     /**
@@ -430,32 +469,30 @@ class YaMap {
             this.placeMarks.forEach(pm => {
                 if (pm.rendered) return;
 
-                let pmGeo = new maps.Placemark(
+                let geoObject = new maps.Placemark(
                     pm.getPosition().toArray(),
                     pm.getOptions(),
                     pm.getConfig()
                 );
 
-                this.mapObject.geoObjects.add(pmGeo);
-
-                pm.setGeoObject(pmGeo);
+                pm.setGeoObject(geoObject);
+                this.mapObject.geoObjects.add(geoObject);
                 pm.rendered = true;
             });
 
             // Render polygons
             this.polygons.forEach(pg => {
-                if (pg.rendered) return false;
+                if (pg.rendered) return;
 
-                pg.geoObject = new maps.Polygon(
+                let geoObject = new maps.Polygon(
                     [pg.getVertexes().map(vx => vx.toArray())],
                     pg.getOptions(),
                     pg.getConfig()
                 );
 
-                this.mapObject.geoObjects.add(pg.geoObject);
+                pg.setGeoObject(geoObject);
+                this.mapObject.geoObjects.add(geoObject);
                 pg.rendered = true;
-
-                pg.startEditing();
             });
         });
     };
@@ -507,7 +544,8 @@ class YaMap {
         }
 
         if (typeof cb === 'function') cb(pm);
-        return;
+
+        return pm;
     };
 
     /**

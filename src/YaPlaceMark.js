@@ -15,10 +15,6 @@ class YaPlaceMark {
             throw new Error('YaPlaceMark: options param should be an object');
         }
 
-
-        this._geoObject = null;
-        this.rendered = false;
-
         this.setPosition(coordinates);
 
         this.text = options.text || '';
@@ -29,6 +25,9 @@ class YaPlaceMark {
         this.preset = options.preset || '';
 
         this.draggable = options.draggable || false;
+
+        this._geoObject = null;
+        this.rendered = false;
     }
 
     /**
@@ -137,8 +136,8 @@ class YaPlaceMark {
      */
     startEditing() {
         this.draggable = true;
-        if (this.geoObject) {
-            this.geoObject.options.set('draggable', true);
+        if (this._geoObject) {
+            this._geoObject.options.set('draggable', true);
         }
     };
 
@@ -147,8 +146,8 @@ class YaPlaceMark {
      */
     finishEditing() {
         this.draggable = false;
-        if (this.geoObject) {
-            this.geoObject.options.set('draggable', false);
+        if (this._geoObject) {
+            this._geoObject.options.set('draggable', false);
         }
     };
 
