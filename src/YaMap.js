@@ -258,6 +258,12 @@ class YaMap {
      */
     getStaticUrl(config = {}) {
         let [latitude, longitude] = this.getCenter().toArray(true);
+
+        if (this.domElement) {
+            config.width = config.width || this.domElement.offsetWidth;
+            config.height = config.height || this.domElement.offsetHeight;
+        }
+
         return YaMap.buildStaticUrl({
             zoom: this.getZoom(),
             latitude,
