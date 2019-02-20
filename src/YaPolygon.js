@@ -41,6 +41,11 @@ class YaPolygon {
             this.fillColor = config.fillColor.replace('#', '');
         }
 
+        this.zIndex = 1;
+        if (typeof config.zIndex === 'number') {
+            this.zIndex = config.zIndex;
+        }
+
         this.opacity = config.opacity || 0.8;
 
         this.rendered = false;
@@ -103,6 +108,7 @@ class YaPolygon {
             strokeColor: '#' + this.strokeColor,
             fillColor: '#' + this.fillColor,
             opacity: this.opacity,
+            zIndex: this.zIndex
         };
     };
 
