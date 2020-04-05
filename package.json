@@ -1,6 +1,6 @@
 {
   "name": "@epoxxid/ya-maps",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Wrapper library for Yandex.Maps service",
   "main": "src/YaMap.js",
   "scripts": {
