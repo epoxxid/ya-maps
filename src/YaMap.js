@@ -7,7 +7,9 @@ const YaPolygon = require('./YaPolygon');
 const DEFAULT_CENTER = [44.99, 41.12];
 const DEFAULT_ZOOM = 10;
 const MAX_ALLOWED_ZOOM = 20;
-const MAPS_SRC = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU&mode=debug';
+const MAPS_BASE_URI = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU&mode=debug';
+
+let _mapServiceApiKey = '';
 
 /**
  *
@@ -37,6 +39,22 @@ class YaMap {
         this.polygons = [];
 
         this._eventHandlers = {};
+    }
+
+    static setApiKey(apiKey) {
+        if (apiKey.length) {
+            _mapServiceApiKey = apiKey;
+        }
+    }
+
+    static getUrl() {
+        let url = MAPS_BASE_URI;
+
+        if (_mapServiceApiKey.length) {
+            url += '&apikey=' + _mapServiceApiKey;
+        }
+
+        return url;
     }
 
     static buildStaticUrl(data = {}, options = {}) {
@@ -154,7 +172,7 @@ class YaMap {
      */
     static getAddressByCoordinates(coordinates, cb) {
         let point = YaPoint.from(coordinates);
-        loader.load(MAPS_SRC).then(maps => {
+        loader.load(YaMap.getUrl()).then(maps => {
             maps.geocode(point.toArray()).then(result => {
                 let obj = result.geoObjects.get(0);
                 let meta = obj.properties.get('metaDataProperty');
@@ -184,7 +202,7 @@ class YaMap {
     static getCoordinatesByAddress(address, cb) {
         if (typeof cb !== 'function') return;
 
-        loader.load(MAPS_SRC).then(maps => {
+        loader.load(YaMap.getUrl()).then(maps => {
             maps.geocode(address, {results: 1}).then(result => {
                 let obj = result.geoObjects.get(0);
                 cb({
@@ -291,7 +309,7 @@ class YaMap {
             }
         }
 
-        loader.load(MAPS_SRC).then(maps => {
+        loader.load(YaMap.getUrl()).then(maps => {
 
             const map = new maps.Map(this.domElement, {
                 center: this.getCenter().toArray(),
@@ -331,7 +349,7 @@ class YaMap {
             this.mapObject = map;
             this.refresh();
 
-            if (typeof cb === 'function') cb(this);             
+            if (typeof cb === 'function') cb(this);
         });
     };
 
@@ -469,7 +487,7 @@ class YaMap {
     refresh() {
         if (!this.mapObject) return;
 
-        loader.load(MAPS_SRC).then((maps) => {
+        loader.load(YaMap.getUrl()).then((maps) => {
 
             // Render place marks
             this.placeMarks.forEach(pm => {
